@@ -1,0 +1,184 @@
+-- NoobiniGUI Library v1.0
+-- GitHub: https://github.com/Aleksz432/NoobiniGUI
+
+local NoobiniUI = {}
+
+-- Случайные имена для элементов GUI
+NoobiniUI.RandomNames = {
+    "NotificationHandler", "PlayerListUI", "ChatSystem", "SettingsPanel",
+    "InventoryUI", "LeaderboardGUI", "ScoreboardUI", "MenuSystem"
+}
+
+-- Цветовая палитра
+NoobiniUI.Colors = {
+    Background = Color3.fromRGB(25, 25, 35),
+    DarkCard = Color3.fromRGB(35, 35, 50),
+    Card = Color3.fromRGB(45, 45, 65),
+    LightCard = Color3.fromRGB(55, 55, 80),
+    Accent = Color3.fromRGB(80, 160, 255),
+    Success = Color3.fromRGB(100, 220, 100),
+    Error = Color3.fromRGB(255, 100, 100),
+    Warning = Color3.fromRGB(255, 200, 80),
+    Text = Color3.fromRGB(245, 245, 245),
+    SubText = Color3.fromRGB(180, 180, 200),
+    Border = Color3.fromRGB(70, 70, 100)
+}
+
+-- Безопасное получение сервисов
+NoobiniUI.SafeGetService = function(service)
+    local success, result = pcall(function()
+        return game:GetService(service)
+    end)
+    return success and result or nil
+end
+
+-- Создание GUI
+NoobiniUI.CreateGUI = function(name)
+    local CoreGui = NoobiniUI.SafeGetService("CoreGui")
+    if not CoreGui then return nil end
+    
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = ScreenGui
+    ScreenGui.Parent = CoreGui
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    ScreenGui.DisplayOrder = 10
+    ScreenGui.ResetOnSpawn = false
+    
+    pcall(function()
+        ScreenGui:SetAttribute("StealthMode", true)
+    end)
+    
+    return ScreenGui
+end
+
+-- Создание карточки с закругленными углами
+NoobiniUI.CreateCard = function(parent, size, position, color, cornerRadius)
+    local card = Instance.new("Frame")
+    card.Name = Frame
+    card.Size = size or UDim2.new(1, 0, 0, 80)
+    card.Position = position or UDim2.new(0, 0, 0, 0)
+    card.BackgroundColor3 = color or NoobiniUI.Colors.Card
+    card.BorderSizePixel = 0
+    card.Parent = parent
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, cornerRadius or 12)
+    corner.Parent = card
+    
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = NoobiniUI.Colors.Border
+    stroke.Thickness = 1
+    stroke.Transparency = 0.2
+    stroke.Parent = card
+    
+    return card
+end
+
+-- Создание кнопки
+NoobiniUI.CreateButton = function(parent, text, callback, color, size, position)
+    local button = Instance.new("TextButton")
+    button.Name = TextButton
+    button.Size = size or UDim2.new(1, 0, 0, 38)
+    button.Position = position or UDim2.new(0, 0, 0, 0)
+    button.BackgroundColor3 = color or NoobiniUI.Colors.Accent
+    button.Text = text
+    button.TextColor3 = NoobiniUI.Colors.Text
+    button.TextSize = 13
+    button.Font = Enum.Font.Gotham
+    button.Parent = parent
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = button
+    
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = color or NoobiniUI.Colors.Accent
+    stroke.Thickness = 1.2
+    stroke.Parent = button
+    
+    -- Анимации при наведении
+    local TweenService = NoobiniUI.SafeGetService("TweenService")
+    if TweenService then
+        button.MouseEnter:Connect(function()
+            TweenService:Create(button, TweenInfo.new(0.15), {
+                BackgroundColor3 = (color or NoobiniUI.Colors.Accent):Lerp(Color3.new(1,1,1), 0.15)
+            }):Play()
+        end)
+        
+        button.MouseLeave:Connect(function()
+            TweenService:Create(button, TweenInfo.new(0.15), {
+                BackgroundColor3 = color or NoobiniUI.Colors.Accent
+            }):Play()
+        end)
+    end
+    
+    if callback then
+        button.MouseButton1Click:Connect(callback)
+    end
+    
+    return button
+end
+
+-- Создание текстовой метки
+NoobiniUI.CreateLabel = function(parent, text, textSize, color, position, size)
+    local label = Instance.new("TextLabel")
+    label.Name = TextLabel
+    label.Size = size or UDim2.new(1, 0, 0, 24)
+    label.Position = position or UDim2.new(0, 0, 0, 0)
+    label.BackgroundTransparency = 1
+    label.Text = text
+    label.TextColor3 = color or NoobiniUI.Colors.Text
+    label.TextSize = textSize or 14
+    label.Font = Enum.Font.Gotham
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = parent
+    
+    return label
+end
+
+-- Создание переключателя
+NoobiniUI.CreateToggle = function(parent, text, initialState, callback, position)
+    local toggleFrame = Instance.new("Frame")
+    toggleFrame.Name = Frame
+    toggleFrame.Size = UDim2.new(1, 0, 0, 30)
+    toggleFrame.Position = position or UDim2.new(0, 0, 0, 0)
+    toggleFrame.BackgroundTransparency = 1
+    toggleFrame.Parent = parent
+    
+    local toggleLabel = NoobiniUI.CreateLabel(toggleFrame, text, 14, NoobiniUI.Colors.Text, UDim2.new(0, 0, 0, 0), UDim2.new(0.7, 0, 1, 0))
+    
+    local toggleButton = Instance.new("TextButton")
+    toggleButton.Name = TextButton
+    toggleButton.Size = UDim2.new(0, 55, 0, 26)
+    toggleButton.Position = UDim2.new(1, -60, 0, 2)
+    toggleButton.BackgroundColor3 = initialState and NoobiniUI.Colors.Success or NoobiniUI.Colors.Error
+    toggleButton.Text = initialState and "ON" or "OFF"
+    toggleButton.TextColor3 = NoobiniUI.Colors.Text
+    toggleButton.TextSize = 12
+    toggleButton.Font = Enum.Font.GothamMedium
+    toggleButton.Parent = toggleFrame
+    
+    local toggleCorner = Instance.new("UICorner")
+    toggleCorner.CornerRadius = UDim.new(0, 8)
+    toggleCorner.Parent = toggleButton
+    
+    local toggleStroke = Instance.new("UIStroke")
+    toggleStroke.Color = initialState and NoobiniUI.Colors.Success or NoobiniUI.Colors.Error
+    toggleStroke.Thickness = 1.2
+    toggleStroke.Parent = toggleButton
+    
+    toggleButton.MouseButton1Click:Connect(function()
+        local newState = not (toggleButton.Text == "ON")
+        toggleButton.BackgroundColor3 = newState and NoobiniUI.Colors.Success or NoobiniUI.Colors.Error
+        toggleButton.Text = newState and "ON" or "OFF"
+        toggleStroke.Color = newState and NoobiniUI.Colors.Success or NoobiniUI.Colors.Error
+        
+        if callback then
+            callback(newState)
+        end
+    end)
+    
+    return toggleFrame
+end
+
+return NoobiniUI
