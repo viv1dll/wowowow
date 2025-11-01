@@ -3,11 +3,14 @@
 
 local NoobiniUI = {}
 
--- Случайные имена для элементов GUI
-NoobiniUI.RandomNames = {
-    "NotificationHandler", "PlayerListUI", "ChatSystem", "SettingsPanel",
-    "InventoryUI", "LeaderboardGUI", "ScoreboardUI", "MenuSystem"
-}
+-- Счетчик для уникальных имен
+local nameCounter = 0
+
+-- Функция для получения уникального имени
+NoobiniUI.GetRandomName = function()
+    nameCounter = nameCounter + 1
+    return "Element_" .. tostring(nameCounter)
+end
 
 -- Цветовая палитра
 NoobiniUI.Colors = {
@@ -38,7 +41,7 @@ NoobiniUI.CreateGUI = function(name)
     if not CoreGui then return nil end
     
     local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = ScreenGui
+    ScreenGui.Name = name or "NoobiniGUI"
     ScreenGui.Parent = CoreGui
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ScreenGui.DisplayOrder = 10
@@ -54,7 +57,7 @@ end
 -- Создание карточки с закругленными углами
 NoobiniUI.CreateCard = function(parent, size, position, color, cornerRadius)
     local card = Instance.new("Frame")
-    card.Name = Frame
+    card.Name = "Card"
     card.Size = size or UDim2.new(1, 0, 0, 80)
     card.Position = position or UDim2.new(0, 0, 0, 0)
     card.BackgroundColor3 = color or NoobiniUI.Colors.Card
@@ -77,7 +80,7 @@ end
 -- Создание кнопки
 NoobiniUI.CreateButton = function(parent, text, callback, color, size, position)
     local button = Instance.new("TextButton")
-    button.Name = TextButton
+    button.Name = "Button"
     button.Size = size or UDim2.new(1, 0, 0, 38)
     button.Position = position or UDim2.new(0, 0, 0, 0)
     button.BackgroundColor3 = color or NoobiniUI.Colors.Accent
@@ -85,6 +88,7 @@ NoobiniUI.CreateButton = function(parent, text, callback, color, size, position)
     button.TextColor3 = NoobiniUI.Colors.Text
     button.TextSize = 13
     button.Font = Enum.Font.Gotham
+    button.BorderSizePixel = 0
     button.Parent = parent
     
     local corner = Instance.new("UICorner")
@@ -122,7 +126,7 @@ end
 -- Создание текстовой метки
 NoobiniUI.CreateLabel = function(parent, text, textSize, color, position, size)
     local label = Instance.new("TextLabel")
-    label.Name = TextLabel
+    label.Name = "Label"
     label.Size = size or UDim2.new(1, 0, 0, 24)
     label.Position = position or UDim2.new(0, 0, 0, 0)
     label.BackgroundTransparency = 1
@@ -131,6 +135,7 @@ NoobiniUI.CreateLabel = function(parent, text, textSize, color, position, size)
     label.TextSize = textSize or 14
     label.Font = Enum.Font.Gotham
     label.TextXAlignment = Enum.TextXAlignment.Left
+    label.BorderSizePixel = 0
     label.Parent = parent
     
     return label
@@ -139,16 +144,17 @@ end
 -- Создание переключателя
 NoobiniUI.CreateToggle = function(parent, text, initialState, callback, position)
     local toggleFrame = Instance.new("Frame")
-    toggleFrame.Name = Frame
+    toggleFrame.Name = "Toggle"
     toggleFrame.Size = UDim2.new(1, 0, 0, 30)
     toggleFrame.Position = position or UDim2.new(0, 0, 0, 0)
     toggleFrame.BackgroundTransparency = 1
+    toggleFrame.BorderSizePixel = 0
     toggleFrame.Parent = parent
     
     local toggleLabel = NoobiniUI.CreateLabel(toggleFrame, text, 14, NoobiniUI.Colors.Text, UDim2.new(0, 0, 0, 0), UDim2.new(0.7, 0, 1, 0))
     
     local toggleButton = Instance.new("TextButton")
-    toggleButton.Name = TextButton
+    toggleButton.Name = "ToggleButton"
     toggleButton.Size = UDim2.new(0, 55, 0, 26)
     toggleButton.Position = UDim2.new(1, -60, 0, 2)
     toggleButton.BackgroundColor3 = initialState and NoobiniUI.Colors.Success or NoobiniUI.Colors.Error
@@ -156,6 +162,7 @@ NoobiniUI.CreateToggle = function(parent, text, initialState, callback, position
     toggleButton.TextColor3 = NoobiniUI.Colors.Text
     toggleButton.TextSize = 12
     toggleButton.Font = Enum.Font.GothamMedium
+    toggleButton.BorderSizePixel = 0
     toggleButton.Parent = toggleFrame
     
     local toggleCorner = Instance.new("UICorner")
